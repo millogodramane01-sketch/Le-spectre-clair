@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Le Spectre Éclair - Créateur Dramane MILLOGO</title>
+    
+    <!-- PWA: Rendre l'application installable -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e2f3c">
+    
+    <!-- PWA: Icône par défaut (Vous devez créer icon-192.png) -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Styles personnalisés avec la police Montserrat (Gras et Moderne) */
@@ -66,7 +75,7 @@
         }
         
         h1 {
-            font-size: 4rem; /* ENCORE PLUS GRAND ET DOMINANT */
+            font-size: 4rem; /* TRÈS GRAND ET DOMINANT */
             margin: 0;
             color: var(--accent-color);
             font-weight: 900; /* TRÈS ÉPAIS / GRAS */
@@ -87,7 +96,7 @@
             letter-spacing: 1px; 
             margin-top: 10px;
             display: block;
-            font-style: italic; /* EN ITALIQUE */
+            font-style: italic; 
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
         }
         
@@ -513,10 +522,30 @@
             displayGameOverMessage(`NOUVEAU RECORD !<br>Félicitations, <span style="color:var(--accent-color)">${playerName}</span> ! Vous êtes l'Équilibriste Expert !`);
         }
         
-        // --- Initialisation ---
+        // --- Initialisation et PWA ---
+        
+        /**
+         * Enregistre le Service Worker pour le mode hors-ligne.
+         */
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    // Tente d'enregistrer le Service Worker. Le fichier sw.js doit exister.
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('Service Worker enregistré avec succès:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.log('Échec de l\'enregistrement du Service Worker (fichier sw.js manquant ou erreur):', error);
+                        });
+                });
+            }
+        }
+
         window.onload = function() {
             updateHighScoreDisplay();
             updateGameInterval();
+            registerServiceWorker(); 
         };
 
         // Assigne les fonctions aux boutons
