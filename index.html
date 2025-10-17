@@ -3,474 +3,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tir Spatial - Record Global</title>
+    <title>Le Spectre Éclair - Créateur Dramane MILLOGO</title>
+    
+    <!-- PWA: Rendre l'application installable -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e2f3c">
+    
+    <!-- PWA: Icône par défaut (Vous devez créer icon-192.png) -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        /* Styles personnalisés avec la police Montserrat (Gras et Moderne) */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap');
+
+        :root {
+            --primary-bg: #222; 
+            --container-bg: rgba(30, 47, 60, 0.95); 
+            --accent-color: #f1c40f; /* Jaune Éclair */
+            --success-color: #2ecc71;
+            --fail-color: #e74c3c;
+            --text-color: #ecf0f1;
+            --border-color: #7f8c8d;
+            --creator-color: #FFFFFF; 
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            transition: background-color 0.5s ease;
         }
+
         #game-container {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            background-color: var(--container-bg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        /* --- TITRE DU JEU (TRÈS GRAND, TRÈS ÉPAIS) --- */
+        #header-area {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        #title-wrapper {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 1rem;
-            background: #161b22;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-width: 95vw;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 5px;
         }
-        canvas {
-            background-color: #010409;
-            border: 2px solid #30363d;
-            border-radius: 8px;
-            touch-action: none; /* Empêche le défilement lors du jeu mobile */
+        
+        #logo-flash {
+            width: 50px; 
+            height: 50px; 
+            color: var(--accent-color); 
+            animation: pulse-flash 1.5s infinite;
         }
-        .info-panel {
-            background: #21262d;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            margin-bottom: 1rem;
-            width: 100%;
+        
+        h1 {
+            font-size: 4rem; /* TRÈS GRAND ET DOMINANT */
+            margin: 0;
+            color: var(--accent-color);
+            font-weight: 900; /* TRÈS ÉPAIS / GRAS */
+            line-height: 1;
+            text-shadow: 
+                3px 3px 0 #000, 
+                6px 6px 0 rgba(0, 0, 0, 0.3), 
+                0 0 25px rgba(241, 196, 15, 0.9); 
+            text-transform: uppercase; 
+        }
+        
+        /* --- NOM DU CRÉATEUR (PETIT TAILLE, POLICE FINE) --- */
+        #creator-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem; /* PETIT TAILLE */
+            font-weight: 400; /* POLICE FINE */
+            color: #d1d5db; 
+            letter-spacing: 1px; 
+            margin-top: 10px;
+            display: block;
+            font-style: italic; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
+        }
+        
+        @keyframes pulse-flash { 
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* --- PANNEAUX D'INFO --- */
+        #top-controls-panel {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1.1rem;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .game-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(45, 50, 60, 0.95);
-            padding: 2rem 3rem;
-            border-radius: 10px;
-            border: 2px solid #58a6ff;
+
+        .info-panel {
+            font-size: 0.9em;
+            font-weight: 900; 
+            padding: 8px;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            flex-grow: 1;
             text-align: center;
-            font-size: 1.5rem;
-            color: #58a6ff;
-            z-index: 10;
-            box-shadow: 0 0 20px rgba(88, 166, 255, 0.5);
+            line-height: 1.2;
+            min-width: 100px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.2);
         }
-        .start-button {
-            padding: 0.75rem 2rem;
-            background-color: #2ea44f;
+        
+        #lastReactionTime {
+            color: var(--success-color);
+            font-size: 1.2em; 
+            font-weight: 900;
+        }
+
+        /* --- Bouton Démarrer --- */
+        #startButton {
+            padding: 15px 30px; 
+            font-size: 1.5em; 
+            font-weight: 900; 
+            background-color: var(--success-color);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 8px 0 #1e8449; 
+            margin-top: 20px;
+            width: 100%;
+            text-transform: uppercase;
         }
-        .start-button:hover {
-            background-color: #2c974b;
+
+        #startButton:hover {
+            background-color: #27ae60;
         }
-        .start-button:active {
-            transform: scale(0.98);
+        
+        #startButton:active {
+            transform: translateY(8px); 
+            box-shadow: none;
         }
+
+        /* --- Modale et Input (Correction de Lisibilité) --- */
+        #nameModal {
+            display: none; 
+        }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: var(--container-bg); padding: 30px; border-radius: 10px;
+            box-shadow: 0 0 0 5px var(--accent-color); text-align: center;
+            max-width: 90%; width: 400px; font-size: 1rem;
+        }
+        .modal-content input {
+            color: #111; /* Police Noire pour la lisibilité */
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            background: var(--text-color); 
+            border: 2px solid var(--accent-color);
+            text-align: center;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .modal-content button {
+            background-color: var(--success-color);
+            box-shadow: 0 3px 0 #047857;
+        }
+        .modal-content button:hover { background-color: #34d399; }
+        
+        /* --- Autres Styles --- */
+        .speed-button {
+             font-weight: 700;
+             box-shadow: 0 4px 0 #047857; 
+        }
+        .speed-button:active { 
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .color-block {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.1s;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5); 
+        }
+        #play-area {
+            min-height: 300px; margin-bottom: 20px; border: 2px dashed #95a5a6;
+            border-radius: 10px; padding: 10px; display: flex; flex-wrap: wrap;
+            justify-content: space-around; align-items: center; gap: 10px;
+        }
+        #message {
+            font-size: 1.1em; color: #bdc3c7; width: 100%;
+        }
+        /* Media Query pour les petits écrans afin de garder le titre lisible */
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 3rem;
+            }
+            #logo-flash {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <h1 class="text-2xl font-bold mb-4 text-center text-blue-400">Tir Spatial (Record Global)</h1>
-    <div class="info-panel">
-        <span class="text-yellow-400">Score: <span id="current-score">0</span></span>
-        <span class="text-red-400">Record Global: <span id="global-record">0</span></span>
-        <span class="text-gray-400 text-sm">ID Joueur: <span id="user-id">...</span></span>
-    </div>
-    <canvas id="gameCanvas"></canvas>
-    <div id="game-message" class="game-message hidden">
-        <p>Jeu Terminé!</p>
-        <p id="final-score" class="my-3 text-white text-3xl"></p>
-        <button id="startButton" class="start-button mt-4">Démarrer</button>
-        <p class="mt-4 text-sm text-gray-400">Utilisez les touches (Flèches/ZQSD) ou glissez sur le mobile pour déplacer.</p>
-    </div>
-</div>
-
-<!-- Firebase SDK Imports -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    // --- Variables Globales d'Authentification et Firestore ---
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    // setLogLevel('debug'); // Décommenter pour voir les logs Firestore
-
-    const GLOBAL_RECORD_DOC_PATH = `/artifacts/${appId}/public/data/global_game_data/record_doc`;
-    let globalHighScore = 0;
-    let userId = 'anon';
-    let isAuthReady = false;
-
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreDisplay = document.getElementById('current-score');
-    const globalRecordDisplay = document.getElementById('global-record');
-    const finalScoreDisplay = document.getElementById('final-score');
-    const messageBox = document.getElementById('game-message');
-    const startButton = document.getElementById('startButton');
-    const userIdDisplay = document.getElementById('user-id');
-
-    // --- Configuration du Jeu ---
-    let raf;
-    let gameRunning = false;
-    let score = 0;
-    const CANVAS_WIDTH = 400;
-    const CANVAS_HEIGHT = 600;
-
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
-
-    // Redimensionnement réactif (très simple pour un jeu centré)
-    function resizeCanvas() {
-        const container = document.getElementById('game-container');
-        const containerWidth = container.clientWidth;
-        const scale = Math.min(containerWidth / CANVAS_WIDTH, window.innerHeight / CANVAS_HEIGHT, 1);
-
-        canvas.style.width = `${CANVAS_WIDTH * scale}px`;
-        canvas.style.height = `${CANVAS_HEIGHT * scale}px`;
-    }
-    window.addEventListener('resize', resizeCanvas);
-
-    // --- Objets du Jeu ---
-    class Player {
-        constructor() {
-            this.x = CANVAS_WIDTH / 2;
-            this.y = CANVAS_HEIGHT - 30;
-            this.width = 40;
-            this.height = 20;
-            this.speed = 5;
-        }
-        draw() {
-            ctx.fillStyle = '#58a6ff'; // Bleu de l'espace
-            ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-            // Cockpit (triangle)
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y - 15);
-            ctx.lineTo(this.x + 10, this.y + 5);
-            ctx.lineTo(this.x - 10, this.y + 5);
-            ctx.closePath();
-            ctx.fillStyle = '#c9d1d9';
-            ctx.fill();
-        }
-        update(dx) {
-            this.x += dx * this.speed;
-            if (this.x < this.width / 2) this.x = this.width / 2;
-            if (this.x > CANVAS_WIDTH - this.width / 2) this.x = CANVAS_WIDTH - this.width / 2;
-        }
-    }
-
-    class Bullet {
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.radius = 3;
-            this.speed = 7;
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff7b72'; // Rouge vif
-            ctx.fill();
-        }
-        update() {
-            this.y -= this.speed;
-        }
-    }
-
-    class Enemy {
-        constructor() {
-            this.x = Math.random() * CANVAS_WIDTH;
-            this.y = -20;
-            this.size = 20 + Math.random() * 15;
-            this.speed = 1 + Math.random() * 1.5;
-            this.color = `hsl(${Math.random() * 60 + 200}, 70%, 50%)`; // Couleurs froides pour les ennemis
-        }
-        draw() {
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.rect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
-            ctx.closePath();
-            ctx.fill();
-        }
-        update() {
-            this.y += this.speed;
-        }
-    }
-
-    let player;
-    let bullets = [];
-    let enemies = [];
-    let enemySpawnTimer = 0;
-    const ENEMY_SPAWN_INTERVAL = 60; // Spawn un ennemi toutes les 60 frames
-
-    // --- Fonctions de Jeu ---
-
-    function resetGame() {
-        player = new Player();
-        bullets = [];
-        enemies = [];
-        score = 0;
-        enemySpawnTimer = 0;
-        scoreDisplay.textContent = score;
-        messageBox.classList.add('hidden');
-        gameRunning = true;
+    <div id="game-container">
         
-        // Initialiser l'animation
-        if (raf) window.cancelAnimationFrame(raf);
-        gameLoop();
-    }
-
-    function checkCollision(obj1, obj2) {
-        const dx = obj1.x - obj2.x;
-        const dy = obj1.y - obj2.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        return distance < (obj1.radius || obj1.width / 2) + (obj2.radius || obj2.size / 2);
-    }
-
-    function endGame() {
-        gameRunning = false;
-        window.cancelAnimationFrame(raf);
-
-        finalScoreDisplay.textContent = `Votre Score: ${score}`;
-        messageBox.classList.remove('hidden');
-
-        // *** LOGIQUE FIREBASE CRITIQUE : Vérification et mise à jour du record global ***
-        if (isAuthReady) {
-            checkAndUpdateGlobalHighScore(score);
-        } else {
-            console.warn("Authentication non prête, impossible de vérifier/mettre à jour le record global.");
-        }
-    }
-    
-    function gameLoop() {
-        if (!gameRunning) return;
-
-        // Effacer le canvas (espace noir)
-        ctx.fillStyle = '#010409';
-        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        // --- Gestion des Ennemis ---
-        enemySpawnTimer++;
-        if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
-            enemies.push(new Enemy());
-            enemySpawnTimer = 0;
-        }
-
-        // Mise à jour et dessin des balles
-        bullets.forEach((bullet, i) => {
-            bullet.update();
-            bullet.draw();
-            // Supprimer les balles hors écran
-            if (bullet.y < 0) bullets.splice(i, 1);
-        });
-
-        // Mise à jour et dessin des ennemis
-        enemies.forEach((enemy, i) => {
-            enemy.update();
-            enemy.draw();
-
-            // Collision Joueur-Ennemi (Fin de partie)
-            if (checkCollision(player, enemy)) {
-                return endGame();
-            }
-
-            // Collision Balle-Ennemi
-            bullets.forEach((bullet, j) => {
-                if (checkCollision(bullet, enemy)) {
-                    // Collision détectée
-                    enemies.splice(i, 1); // Supprimer l'ennemi
-                    bullets.splice(j, 1); // Supprimer la balle
-                    score += 10;
-                    scoreDisplay.textContent = score;
-                }
-            });
-
-            // Ennemi hors écran (perdu)
-            if (enemy.y > CANVAS_HEIGHT) {
-                enemies.splice(i, 1);
-                // Si l'ennemi atteint le bas, la partie est terminée
-                return endGame(); 
-            }
-        });
-
-        // Dessin du joueur
-        player.draw();
-
-        raf = window.requestAnimationFrame(gameLoop);
-    }
-
-    // --- Contrôles (Clavier) ---
-    const keys = {};
-    window.addEventListener('keydown', (e) => {
-        keys[e.key] = true;
-        handleControls();
-    });
-    window.addEventListener('keyup', (e) => {
-        keys[e.key] = false;
-    });
-
-    function handleControls() {
-        let dx = 0;
-        // ZQSD ou Flèches
-        if (keys['ArrowLeft'] || keys['q'] || keys['Q'] || keys['a'] || keys['A']) dx = -1;
-        if (keys['ArrowRight'] || keys['d'] || keys['D']) dx = 1;
-        player.update(dx);
-
-        // Tir
-        if (keys[' '] || keys['ArrowUp'] || keys['z'] || keys['Z'] || keys['w'] || keys['W']) {
-            // Limiter le taux de tir
-            if (bullets.length === 0 || player.y - bullets[bullets.length - 1].y > 20) {
-                bullets.push(new Bullet(player.x, player.y - 15));
-            }
-        }
-    }
-    // Appel régulier pour la mise à jour des mouvements continus
-    setInterval(handleControls, 1000 / 60);
-
-
-    // --- Contrôles (Mobile/Tactile) ---
-    let lastTouchX = null;
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        lastTouchX = e.touches[0].clientX;
-        // Tirer immédiatement au toucher
-        bullets.push(new Bullet(player.x, player.y - 15));
-    });
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        const currentTouchX = e.touches[0].clientX;
-        const canvasRect = canvas.getBoundingClientRect();
-        const scale = CANVAS_WIDTH / canvasRect.width;
-
-        if (lastTouchX !== null) {
-            // Calculer le mouvement en coordonnées canvas
-            const touchDeltaX = (currentTouchX - lastTouchX) * scale;
-            
-            // Mise à jour du joueur (mouvement proportionnel au glissement)
-            player.x += touchDeltaX * 1.5; // Multiplicateur pour une meilleure réactivité
-
-            // Clamper les limites du joueur
-            if (player.x < player.width / 2) player.x = player.width / 2;
-            if (player.x > CANVAS_WIDTH - player.width / 2) player.x = CANVAS_WIDTH - player.width / 2;
-        }
-        lastTouchX = currentTouchX;
-    });
-
-    canvas.addEventListener('touchend', () => {
-        lastTouchX = null;
-    });
-
-
-    // --- LOGIQUE FIREBASE pour Record Global ---
-
-    /**
-     * Configure l'écouteur en temps réel pour le Record Global.
-     * Met à jour la variable globale `globalHighScore` et l'affichage.
-     * @param {Firestore} db L'instance Firestore.
-     */
-    function setupFirestoreListener(db) {
-        const docRef = doc(db, GLOBAL_RECORD_DOC_PATH);
-
-        // onSnapshot écoute le document en temps réel
-        onSnapshot(docRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                // Assurez-vous que le score est un nombre, sinon 0
-                globalHighScore = typeof data.score === 'number' ? data.score : 0;
+        <div id="header-area">
+            <div id="title-wrapper">
                 
-                // Mettre à jour l'affichage pour tous les joueurs
-                globalRecordDisplay.textContent = globalHighScore;
-            } else {
-                // Le document n'existe pas encore, on le crée
-                globalHighScore = 0;
-                setDoc(docRef, { score: 0, userId: 'system', lastUpdated: Date.now() }, { merge: true }).catch(console.error);
-            }
-        }, (error) => {
-            console.error("Erreur lors de l'écoute du record global: ", error);
-        });
-    }
+                <svg id="logo-flash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11 15.69v5.82c0 .81.99 1.13 1.55.56l5.7-5.7c.3-.3.45-.66.45-1.01V7.91c0-.81-.99-1.13-1.55-.56l-5.7 5.7c-.3.3-.45.66-.45 1.01v1.54zM7 2.5a.5.5 0 00-.5.5v12.62c0 .82.99 1.13 1.55.56l5.7-5.7c.3-.3.45-.66.45-1.01V5.01c0-.81-.99-1.13-1.55-.56l-5.7 5.7c-.3.3-.45.66-.45 1.01V3a.5.5 0 00-.5-.5z"/>
+                </svg>
+                <h1>LE SPECTRE ÉCLAIR</h1>
+            </div>
+            
+            <span id="creator-name">Créé par Dramane MILLOGO</span>
+        </div>
+        
+        <div id="top-controls-panel">
+            <div id="game-status" class="info-panel">
+                Score: <span id="score-value">0</span> | Vies: <span id="lives-value">3</span>
+            </div>
+            
+            <div id="reaction-panel" class="info-panel">
+                Réaction: <span id="lastReactionTime">--</span>
+            </div>
 
-    /**
-     * Vérifie si le score actuel est un nouveau record global et le met à jour dans Firestore.
-     * @param {number} score Le score final de la partie.
-     */
-    async function checkAndUpdateGlobalHighScore(score) {
-        if (score > globalHighScore) {
-            const docRef = doc(db, GLOBAL_RECORD_DOC_PATH);
-            try {
-                // Envoie du nouveau record à Firestore
-                await setDoc(docRef, {
-                    score: score,
-                    userId: userId,
-                    lastUpdated: Date.now()
-                }, { merge: true });
-                // L'écouteur `onSnapshot` se chargera de mettre à jour la variable `globalHighScore` 
-                // et l'affichage pour nous et tous les autres joueurs.
-                console.log(`Nouveau record global potentiel (${score}) enregistré par ${userId}.`);
-            } catch (e) {
-                console.error("Erreur lors de la mise à jour du record global: ", e);
+            <div class="speed-controls w-full md:w-auto">
+                <button class="speed-button" onclick="decreaseSpeed()">Lent (-)</button>
+                <span id="currentSpeedLabel" class="speed-label">Normal</span>
+                <button class="speed-button" onclick="increaseSpeed()">Rapide (+)</button>
+            </div>
+            
+            <div id="highScore" class="info-panel"></div>
+        </div>
+
+        <div id="play-area">
+            <p id="message">Cliquez sur Démarrer pour jouer. Le but est de cliquer sur le bloc de couleur qui NE CORRESPOND PAS à la couleur de fond.</p>
+        </div>
+        
+        <button id="startButton">CLIQUEZ POUR DÉMARRER</button>
+    </div>
+
+    
+    <div id="nameModal" class="modal-overlay">
+        <div class="modal-content">
+            <p class="text-lg font-bold mb-4" style="color: var(--accent-color);">👑 NOUVEAU RECORD PERSONNEL ! 🎖️</p>
+            <p>Félicitations, Expert ! Entrez votre nom pour enregistrer votre performance :</p>
+            <input type="text" id="playerNameInput" maxlength="15" placeholder="Votre nom (Max 15 caractères)" />
+            <button id="submitNameButton" class="speed-button" onclick="saveNewHighScore()">VALIDER</button>
+        </div>
+    </div>
+
+    <script>
+        // === ÉLÉMENTS DU DOM ===
+        const body = document.body;
+        const playArea = document.getElementById('play-area');
+        const startButton = document.getElementById('startButton');
+        const scoreValue = document.getElementById('score-value');
+        const livesValue = document.getElementById('lives-value');
+        const message = document.getElementById('message');
+        const highScoreDisplay = document.getElementById('highScore');
+        const currentSpeedLabel = document.getElementById('currentSpeedLabel');
+        const nameModal = document.getElementById('nameModal');
+        const playerNameInput = document.getElementById('playerNameInput');
+        const lastReactionTimeDisplay = document.getElementById('lastReactionTime'); 
+
+        // === PARAMÈTRES ET ÉTAT DU JEU ===
+        const COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6']; 
+        const INITIAL_SPEED = 1500;
+        const SPEED_STEP = 200;
+        const MIN_INTERVAL = 600;
+        const MAX_INTERVAL = 3000;
+
+        let score = 0;
+        let lives = 3;
+        let gameInterval;
+        let gameSpeed = INITIAL_SPEED;
+        let startTime; 
+
+        // Meilleur score stocké sous forme d'objet JSON
+        let high_score_data = JSON.parse(localStorage.getItem('equilibreExpertHighScoreData')) || { score: 0, name: 'Anonyme' };
+
+        // --- Fonctions Utilitaires ---
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        function updateHighScoreDisplay() {
+            const { score: bestScore, name: bestName } = high_score_data;
+            const badge = '<span class="badge" title="Expert de l\'Équilibre">🎖️</span>';
+            const crown = '<span class="badge" title="Détenteur du Record">👑</span>';
+            
+            highScoreDisplay.innerHTML = `${crown} ${bestName} <br>Score: ${bestScore} ${badge}`;
+        }
+        
+        function getSpeedName(interval) {
+            if (interval <= 700) return 'Expert (⚡)';
+            if (interval <= 1200) return 'Rapide';
+            if (interval <= 2000) return 'Normal';
+            return 'Lent';
+        }
+
+        function updateGameInterval() {
+            currentSpeedLabel.textContent = getSpeedName(gameSpeed);
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                if (startButton.textContent === "RECOMMENCER" || startButton.textContent === "REJOUER") {
+                    gameInterval = setInterval(mainGameLogic, gameSpeed);
+                }
             }
         }
-    }
 
-
-    // --- Initialisation de l'Application ---
-    window.onload = async function() {
-        resizeCanvas();
-
-        // 1. Authentification
-        try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+        function increaseSpeed() {
+            if (gameSpeed > MIN_INTERVAL) {
+                gameSpeed = Math.max(MIN_INTERVAL, gameSpeed - SPEED_STEP);
+                updateGameInterval();
             }
-        } catch (error) {
-            console.error("Erreur d'authentification:", error);
-            await signInAnonymously(auth); // Fallback
         }
 
-        // 2. Écoute des changements d'état d'authentification
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userId = user.uid;
-                userIdDisplay.textContent = user.uid.substring(0, 8) + '...'; // Afficher un extrait
-                isAuthReady = true;
-                console.log("Authentification complète. Démarrage de l'écoute Firestore.");
-                // Démarrer l'écoute seulement après l'authentification
-                setupFirestoreListener(db);
-            } else {
-                // Si non authentifié (très peu probable dans cet environnement), on utilise un ID temporaire
-                userId = 'anon-' + (crypto.randomUUID ? crypto.randomUUID().substring(0, 8) : Date.now());
-                userIdDisplay.textContent = userId;
-                isAuthReady = true;
+        function decreaseSpeed() {
+            if (gameSpeed < MAX_INTERVAL) {
+                gameSpeed = Math.min(MAX_INTERVAL, gameSpeed + SPEED_STEP);
+                updateGameInterval();
             }
-        });
+        }
 
-        // 3. Bouton Démarrer
-        startButton.addEventListener('click', resetGame);
+        // --- Logique du Jeu ---
 
-        // Afficher le message initial
-        messageBox.classList.remove('hidden');
-        finalScoreDisplay.textContent = `Record Global Actuel: ${globalHighScore}`;
-    };
+        function gameLoop() {
+            mainGameLogic(); 
+        }
 
-</script>
+        function mainGameLogic() {
+            startTime = performance.now(); 
+            
+            playArea.innerHTML = '';
 
+            const currentBgColor = getRandomElement(COLORS);
+            body.style.backgroundColor = currentBgColor;
+
+            const intrusiveColor = getRandomElement(COLORS.filter(c => c !== currentBgColor));
+
+            // Augmentation progressive de la difficulté
+            const numBlocks = Math.min(10, 4 + Math.floor(score / 5)); 
+            
+            const intrusiveIndex = Math.floor(Math.random() * numBlocks);
+            
+            for (let i = 0; i < numBlocks; i++) {
+                const block = document.createElement('div');
+                block.classList.add('color-block');
+                
+                if (i === intrusiveIndex) {
+                    block.style.backgroundColor = intrusiveColor;
+                    block.dataset.isTarget = 'true';
+                } else {
+                    block.style.backgroundColor = currentBgColor;
+                    block.dataset.isTarget = 'false';
+                }
+                
+                block.addEventListener('click', handleBlockClick);
+                playArea.appendChild(block);
+            }
+        }
+        
+        function handleBlockClick(e) {
+            // Empêche le clic si la modale est ouverte (protection)
+            if (nameModal.style.display === 'flex') return;
+
+            if (e.target.dataset.isTarget === 'true') {
+                // BON CLIC
+                score++;
+                scoreValue.textContent = score;
+                
+                // Mesure du temps de réaction (concentration)
+                const endTime = performance.now();
+                const reactionTime = Math.floor(endTime - startTime);
+                lastReactionTimeDisplay.textContent = `${reactionTime} ms`;
+                
+                if (gameInterval) clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed);
+                gameLoop(); 
+            } else {
+                // MAUVAIS CLIC
+                lives--;
+                livesValue.textContent = lives;
+                
+                // Vibration (si disponible)
+                if ("vibrate" in navigator) {
+                    navigator.vibrate(200); 
+                }
+                
+                // Effet visuel d'erreur (Flash rouge)
+                body.style.backgroundColor = '#c0392b'; 
+                setTimeout(() => { 
+                    if(lives > 0) {
+                         const currentBlocks = playArea.querySelectorAll('.color-block');
+                         if (currentBlocks.length > 0) {
+                            const bgColor = currentBlocks[0].dataset.isTarget === 'false' ? currentBlocks[0].style.backgroundColor : getRandomElement(COLORS);
+                            body.style.backgroundColor = bgColor;
+                         } else {
+                            body.style.backgroundColor = getRandomElement(COLORS);
+                         }
+                    }
+                }, 200);
+
+
+                if (lives <= 0) {
+                    gameOver();
+                } else {
+                    if (gameInterval) clearInterval(gameInterval);
+                    gameInterval = setInterval(gameLoop, gameSpeed);
+                    gameLoop();
+                }
+            }
+        }
+        
+        // --- États du Jeu ---
+        
+        function startGame() {
+            score = 0;
+            lives = 3;
+            gameSpeed = INITIAL_SPEED;
+            scoreValue.textContent = score;
+            livesValue.textContent = lives;
+            lastReactionTimeDisplay.textContent = '--'; 
+            
+            message.style.display = 'none';
+            startButton.textContent = "RECOMMENCER";
+
+            updateGameInterval();
+            clearInterval(gameInterval); 
+            gameInterval = setInterval(gameLoop, gameSpeed);
+
+            mainGameLogic();
+        }
+
+        function gameOver() {
+            if (gameInterval) clearInterval(gameInterval);
+            
+            // --- CONTRÔLE DE LA MODALE : Affichage UNIQUEMENT si le record est battu ---
+            if (score > high_score_data.score) {
+                // Affiche la modale et met le focus sur le champ de nom
+                nameModal.style.display = 'flex'; 
+                playerNameInput.value = high_score_data.name === 'Anonyme' ? '' : high_score_data.name;
+                playerNameInput.focus();
+            } else {
+                // Affiche simplement le message de fin de partie
+                displayGameOverMessage(`PARTIE TERMINÉE ! Score final: ${score}<br>Meilleur score: ${high_score_data.score}`);
+            }
+
+            startButton.textContent = "REJOUER";
+            body.style.backgroundColor = '#222'; 
+        }
+        
+        function displayGameOverMessage(htmlContent) {
+            playArea.innerHTML = `<p id="message">${htmlContent}</p>`;
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.style.fontSize = '1.2em';
+                messageElement.style.fontWeight = '900';
+                messageElement.style.color = 'var(--fail-color)';
+            }
+        }
+
+        /**
+         * Gère la sauvegarde du nouveau record personnel avec le nom.
+         */
+        function saveNewHighScore() {
+            let playerName = playerNameInput.value.trim();
+            if (playerName.length === 0) {
+                playerName = 'Expert Inconnu';
+            }
+            if (playerName.length > 15) {
+                playerName = playerName.substring(0, 15);
+            }
+
+            high_score_data = {
+                score: score,
+                name: playerName
+            };
+            
+            localStorage.setItem('equilibreExpertHighScoreData', JSON.stringify(high_score_data));
+            
+            nameModal.style.display = 'none';
+            
+            updateHighScoreDisplay();
+            displayGameOverMessage(`NOUVEAU RECORD !<br>Félicitations, <span style="color:var(--accent-color)">${playerName}</span> ! Vous êtes l'Équilibriste Expert !`);
+        }
+        
+        // --- Initialisation et PWA ---
+        
+        /**
+         * Enregistre le Service Worker pour le mode hors-ligne.
+         */
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    // Tente d'enregistrer le Service Worker. Le fichier sw.js doit exister.
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('Service Worker enregistré avec succès:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.log('Échec de l\'enregistrement du Service Worker (fichier sw.js manquant ou erreur):', error);
+                        });
+                });
+            }
+        }
+
+        window.onload = function() {
+            updateHighScoreDisplay();
+            updateGameInterval();
+            registerServiceWorker(); 
+        };
+
+        // Assigne les fonctions aux boutons
+        window.increaseSpeed = increaseSpeed;
+        window.decreaseSpeed = decreaseSpeed;
+        window.saveNewHighScore = saveNewHighScore;
+        startButton.addEventListener('click', startGame);
+
+    </script>
 </body>
 </html>
