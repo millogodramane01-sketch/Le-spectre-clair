@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Spectre Éclair - Créateur Dramane MILLOGO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Styles personnalisés avec la police Montserrat (Gras et Moderne) */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+        :root {
+            --primary-bg: #222; 
+            --container-bg: rgba(30, 47, 60, 0.95); 
+            --accent-color: #f1c40f; /* Jaune Éclair */
+            --success-color: #2ecc71;
+            --fail-color: #e74c3c;
+            --text-color: #ecf0f1;
+            --border-color: #7f8c8d;
+            --creator-color: #FFFFFF; /* BLANC PUR pour le nom */
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background-color 0.5s ease;
+        }
+
+        #game-container {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            background-color: var(--container-bg);
+            /* Effet 3D sur le conteneur */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        /* --- TITRE DU JEU --- */
+        #header-area {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        #title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+        
+        #logo-flash {
+            width: 40px;
+            height: 40px;
+            color: var(--accent-color); 
+            animation: pulse-flash 1.5s infinite;
+        }
+        
+        h1 {
+            font-size: 2.5rem; 
+            margin: 0;
+            color: var(--accent-color);
+            font-weight: 900;
+            line-height: 1;
+            /* Effet 3D et Lueur */
+            text-shadow: 
+                2px 2px 0 #000, 
+                4px 4px 0 rgba(0, 0, 0, 0.3), 
+                0 0 20px rgba(241, 196, 15, 0.8); 
+        }
+        
+        /* --- NOM DU CRÉATEUR (BLANC, GRAS, STYLÉ) --- */
+        #creator-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem; 
+            font-weight: 900; 
+            color: var(--creator-color); 
+            letter-spacing: 5px; 
+            margin-top: 10px;
+            display: block;
+            text-transform: uppercase;
+            /* Effet 3D/Glow */
+            text-shadow: 
+                1px 1px 3px rgba(0, 0, 0, 0.7), 
+                0 0 15px rgba(100, 150, 255, 0.7); 
+        }
+        
+        @keyframes pulse-flash { 
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* --- PANNEAUX D'INFO --- */
+        #top-controls-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .info-panel {
+            font-size: 0.9em;
+            font-weight: 900; 
+            padding: 8px;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            flex-grow: 1;
+            text-align: center;
+            line-height: 1.2;
+            min-width: 100px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        #lastReactionTime {
+            color: var(--success-color);
+            font-size: 1.2em; 
+            font-weight: 900;
+        }
+
+        /* --- Bouton Démarrer (Amélioré) --- */
+        #startButton {
+            padding: 15px 30px; /* Plus grand padding */
+            font-size: 1.5em; /* PLUS GRANDE POLICE */
+            font-weight: 900; /* TRÈS GRAS */
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 8px 0 #1e8449; /* Effet 3D très prononcé */
+            margin-top: 20px;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        #startButton:hover {
+            background-color: #27ae60;
+        }
+        
+        #startButton:active {
+            transform: translateY(8px); /* Enfoncement maximum */
+            box-shadow: none;
+        }
+
+        /* --- Autres Styles conservés (Vibration, Modale, Blocs de couleur) --- */
+        .speed-button {
+             font-weight: 700;
+             box-shadow: 0 4px 0 #047857; 
+        }
+        .speed-button:active { 
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .color-block {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.1s;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5); 
+        }
+        #nameModal {
+            /* S'ASSURE QU'ELLE EST CACHÉE PAR DÉFAUT */
+            display: none; 
+        }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: var(--container-bg); padding: 30px; border-radius: 10px;
+            box-shadow: 0 0 0 5px var(--accent-color); text-align: center;
+            max-width: 90%; width: 400px; font-size: 1rem;
+        }
+        .modal-content button {
+            background-color: var(--success-color);
+            box-shadow: 0 3px 0 #047857;
+        }
+        .modal-content button:hover { background-color: #34d399; }
+        #play-area {
+            min-height: 300px; margin-bottom: 20px; border: 2px dashed #95a5a6;
+            border-radius: 10px; padding: 10px; display: flex; flex-wrap: wrap;
+            justify-content: space-around; align-items: center; gap: 10px;
+        }
+        #message {
+            font-size: 1.1em; color: #bdc3c7; width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        
+        <div id="header-area">
+            <div id="title-wrapper">
+                <!-- LOGO ÉCLAIR SVG -->
+                <svg id="logo-flash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11 15.69v5.82c0 .81.99 1.13 1.55.56l5.7-5.7c.3-.3.45-.66.45-1.01V7.91c0-.81-.99-1.13-1.55-.56l-5.7 5.7c-.3.3-.45.66-.45 1.01v1.54zM7 2.5a.5.5 0 00-.5.5v12.62c0 .82.99 1.13 1.55.56l5.7-5.7c.3-.3.45-.66.45-1.01V5.01c0-.81-.99-1.13-1.55-.56l-5.7 5.7c-.3.3-.45.66-.45 1.01V3a.5.5 0 00-.5-.5z"/>
+                </svg>
+                <h1>LE SPECTRE ÉCLAIR</h1>
+            </div>
+            <span id="creator-name">DRAMANE MILLOGO</span>
+        </div>
+        
+        <div id="top-controls-panel">
+            <div id="game-status" class="info-panel">
+                Score: <span id="score-value">0</span> | Vies: <span id="lives-value">3</span>
+            </div>
+            
+            <div id="reaction-panel" class="info-panel">
+                Réaction: <span id="lastReactionTime">--</span>
+            </div>
+
+            <div class="speed-controls w-full md:w-auto">
+                <button class="speed-button" onclick="decreaseSpeed()">Lent (-)</button>
+                <span id="currentSpeedLabel" class="speed-label">Normal</span>
+                <button class="speed-button" onclick="increaseSpeed()">Rapide (+)</button>
+            </div>
+            
+            <div id="highScore" class="info-panel"></div>
+        </div>
+
+        <div id="play-area">
+            <p id="message">Cliquez sur Démarrer pour jouer. Le but est de cliquer sur le bloc de couleur qui NE CORRESPOND PAS à la couleur de fond.</p>
+        </div>
+        
+        <button id="startButton">CLIQUEZ POUR DÉMARRER</button>
+    </div>
+
+    <!-- MODALE POUR LA SAISIE DU NOM (CACHÉE PAR DÉFAUT) -->
+    <div id="nameModal" class="modal-overlay">
+        <div class="modal-content">
+            <p class="text-lg font-bold mb-4" style="color: var(--accent-color);">👑 NOUVEAU RECORD PERSONNEL ! 🎖️</p>
+            <p>Félicitations, Expert ! Entrez votre nom pour enregistrer votre performance :</p>
+            <input type="text" id="playerNameInput" maxlength="15" placeholder="Votre nom (Max 15 caractères)" />
+            <button id="submitNameButton" class="speed-button" onclick="saveNewHighScore()">VALIDER</button>
+        </div>
+    </div>
+
+    <script>
+        // === ÉLÉMENTS DU DOM ===
+        const body = document.body;
+        const playArea = document.getElementById('play-area');
+        const startButton = document.getElementById('startButton');
+        const scoreValue = document.getElementById('score-value');
+        const livesValue = document.getElementById('lives-value');
+        const message = document.getElementById('message');
+        const highScoreDisplay = document.getElementById('highScore');
+        const currentSpeedLabel = document.getElementById('currentSpeedLabel');
+        const nameModal = document.getElementById('nameModal');
+        const playerNameInput = document.getElementById('playerNameInput');
+        const lastReactionTimeDisplay = document.getElementById('lastReactionTime'); 
+
+        // === PARAMÈTRES ET ÉTAT DU JEU ===
+        const COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6']; 
+        const INITIAL_SPEED = 1500;
+        const SPEED_STEP = 200;
+        const MIN_INTERVAL = 600;
+        const MAX_INTERVAL = 3000;
+
+        let score = 0;
+        let lives = 3;
+        let gameInterval;
+        let gameSpeed = INITIAL_SPEED;
+        let startTime; 
+
+        // Meilleur score stocké sous forme d'objet JSON
+        let high_score_data = JSON.parse(localStorage.getItem('equilibreExpertHighScoreData')) || { score: 0, name: 'Anonyme' };
+
+        // --- Fonctions Utilitaires ---
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        function updateHighScoreDisplay() {
+            const { score: bestScore, name: bestName } = high_score_data;
+            const badge = '<span class="badge" title="Expert de l\'Équilibre">🎖️</span>';
+            const crown = '<span class="badge" title="Détenteur du Record">👑</span>';
+            
+            highScoreDisplay.innerHTML = `${crown} ${bestName} <br>Score: ${bestScore} ${badge}`;
+        }
+        
+        function getSpeedName(interval) {
+            if (interval <= 700) return 'Expert (⚡)';
+            if (interval <= 1200) return 'Rapide';
+            if (interval <= 2000) return 'Normal';
+            return 'Lent';
+        }
+
+        function updateGameInterval() {
+            currentSpeedLabel.textContent = getSpeedName(gameSpeed);
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                if (startButton.textContent === "RECOMMENCER" || startButton.textContent === "REJOUER") {
+                    gameInterval = setInterval(mainGameLogic, gameSpeed);
+                }
+            }
+        }
+
+        function increaseSpeed() {
+            if (gameSpeed > MIN_INTERVAL) {
+                gameSpeed = Math.max(MIN_INTERVAL, gameSpeed - SPEED_STEP);
+                updateGameInterval();
+            }
+        }
+
+        function decreaseSpeed() {
+            if (gameSpeed < MAX_INTERVAL) {
+                gameSpeed = Math.min(MAX_INTERVAL, gameSpeed + SPEED_STEP);
+                updateGameInterval();
+            }
+        }
+
+        // --- Logique du Jeu ---
+
+        function gameLoop() {
+            mainGameLogic(); 
+        }
+
+        function mainGameLogic() {
+            startTime = performance.now(); 
+            
+            playArea.innerHTML = '';
+
+            const currentBgColor = getRandomElement(COLORS);
+            body.style.backgroundColor = currentBgColor;
+
+            const intrusiveColor = getRandomElement(COLORS.filter(c => c !== currentBgColor));
+
+            // Augmentation progressive de la difficulté
+            const numBlocks = Math.min(10, 4 + Math.floor(score / 5)); 
+            
+            const intrusiveIndex = Math.floor(Math.random() * numBlocks);
+            
+            for (let i = 0; i < numBlocks; i++) {
+                const block = document.createElement('div');
+                block.classList.add('color-block');
+                
+                if (i === intrusiveIndex) {
+                    block.style.backgroundColor = intrusiveColor;
+                    block.dataset.isTarget = 'true';
+                } else {
+                    block.style.backgroundColor = currentBgColor;
+                    block.dataset.isTarget = 'false';
+                }
+                
+                block.addEventListener('click', handleBlockClick);
+                playArea.appendChild(block);
+            }
+        }
+        
+        function handleBlockClick(e) {
+            // Empêche le clic si la modale est ouverte (protection)
+            if (nameModal.style.display === 'flex') return;
+
+            if (e.target.dataset.isTarget === 'true') {
+                // BON CLIC
+                score++;
+                scoreValue.textContent = score;
+                
+                // Mesure du temps de réaction (concentration)
+                const endTime = performance.now();
+                const reactionTime = Math.floor(endTime - startTime);
+                lastReactionTimeDisplay.textContent = `${reactionTime} ms`;
+                
+                if (gameInterval) clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed);
+                gameLoop(); 
+            } else {
+                // MAUVAIS CLIC
+                lives--;
+                livesValue.textContent = lives;
+                
+                // Vibration (si disponible)
+                if ("vibrate" in navigator) {
+                    navigator.vibrate(200); 
+                }
+                
+                // Effet visuel d'erreur (Flash rouge)
+                body.style.backgroundColor = '#c0392b'; 
+                setTimeout(() => { 
+                    if(lives > 0) {
+                         const currentBlocks = playArea.querySelectorAll('.color-block');
+                         if (currentBlocks.length > 0) {
+                            const bgColor = currentBlocks[0].dataset.isTarget === 'false' ? currentBlocks[0].style.backgroundColor : getRandomElement(COLORS);
+                            body.style.backgroundColor = bgColor;
+                         } else {
+                            body.style.backgroundColor = getRandomElement(COLORS);
+                         }
+                    }
+                }, 200);
+
+
+                if (lives <= 0) {
+                    gameOver();
+                } else {
+                    if (gameInterval) clearInterval(gameInterval);
+                    gameInterval = setInterval(gameLoop, gameSpeed);
+                    gameLoop();
+                }
+            }
+        }
+        
+        // --- États du Jeu ---
+        
+        function startGame() {
+            score = 0;
+            lives = 3;
+            gameSpeed = INITIAL_SPEED;
+            scoreValue.textContent = score;
+            livesValue.textContent = lives;
+            lastReactionTimeDisplay.textContent = '--'; 
+            
+            message.style.display = 'none';
+            startButton.textContent = "RECOMMENCER";
+
+            updateGameInterval();
+            clearInterval(gameInterval); 
+            gameInterval = setInterval(gameLoop, gameSpeed);
+
+            mainGameLogic();
+        }
+
+        function gameOver() {
+            if (gameInterval) clearInterval(gameInterval);
+            
+            // --- CONTRÔLE DE LA MODALE : Affichage UNIQUEMENT si le record est battu ---
+            if (score > high_score_data.score) {
+                // Affiche la modale et met le focus sur le champ de nom
+                nameModal.style.display = 'flex'; 
+                playerNameInput.value = high_score_data.name === 'Anonyme' ? '' : high_score_data.name;
+                playerNameInput.focus();
+            } else {
+                // Affiche simplement le message de fin de partie
+                displayGameOverMessage(`PARTIE TERMINÉE ! Score final: ${score}<br>Meilleur score: ${high_score_data.score}`);
+            }
+
+            startButton.textContent = "REJOUER";
+            body.style.backgroundColor = '#222'; 
+        }
+        
+        function displayGameOverMessage(htmlContent) {
+            playArea.innerHTML = `<p id="message">${htmlContent}</p>`;
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.style.fontSize = '1.2em';
+                messageElement.style.fontWeight = '900';
+                messageElement.style.color = 'var(--fail-color)';
+            }
+        }
+
+        /**
+         * Gère la sauvegarde du nouveau record personnel avec le nom.
+         */
+        function saveNewHighScore() {
+            let playerName = playerNameInput.value.trim();
+            if (playerName.length === 0) {
+                playerName = 'Expert Inconnu';
+            }
+            if (playerName.length > 15) {
+                playerName = playerName.substring(0, 15);
+            }
+
+            high_score_data = {
+                score: score,
+                name: playerName
+            };
+            
+            localStorage.setItem('equilibreExpertHighScoreData', JSON.stringify(high_score_data));
+            
+            nameModal.style.display = 'none';
+            
+            updateHighScoreDisplay();
+            displayGameOverMessage(`NOUVEAU RECORD !<br>Félicitations, <span style="color:var(--accent-color)">${playerName}</span> ! Vous êtes l'Équilibriste Expert !`);
+        }
+        
+        // --- Initialisation ---
+        window.onload = function() {
+            updateHighScoreDisplay();
+            updateGameInterval();
+        };
+
+        // Assigne les fonctions aux boutons
+        window.increaseSpeed = increaseSpeed;
+        window.decreaseSpeed = decreaseSpeed;
+        window.saveNewHighScore = saveNewHighScore;
+        startButton.addEventListener('click', startGame);
+
+    </script>
+</body>
+</html>
