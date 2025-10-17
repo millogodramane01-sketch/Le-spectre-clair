@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Styles personnalisés avec la police Montserrat (Gras et Moderne) */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap');
 
         :root {
             --primary-bg: #222; 
@@ -17,7 +17,7 @@
             --fail-color: #e74c3c;
             --text-color: #ecf0f1;
             --border-color: #7f8c8d;
-            --creator-color: #FFFFFF; /* BLANC PUR pour le nom */
+            --creator-color: #FFFFFF; 
         }
 
         body {
@@ -37,14 +37,13 @@
             padding: 30px;
             border-radius: 15px;
             background-color: var(--container-bg);
-            /* Effet 3D sur le conteneur */
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(255, 255, 255, 0.1);
             width: 90%;
             max-width: 600px;
             position: relative;
         }
 
-        /* --- TITRE DU JEU --- */
+        /* --- TITRE DU JEU (TRÈS GRAND, TRÈS ÉPAIS) --- */
         #header-area {
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -60,39 +59,36 @@
         }
         
         #logo-flash {
-            width: 40px;
-            height: 40px;
+            width: 50px; 
+            height: 50px; 
             color: var(--accent-color); 
             animation: pulse-flash 1.5s infinite;
         }
         
         h1 {
-            font-size: 2.5rem; 
+            font-size: 4rem; /* ENCORE PLUS GRAND ET DOMINANT */
             margin: 0;
             color: var(--accent-color);
-            font-weight: 900;
+            font-weight: 900; /* TRÈS ÉPAIS / GRAS */
             line-height: 1;
-            /* Effet 3D et Lueur */
             text-shadow: 
-                2px 2px 0 #000, 
-                4px 4px 0 rgba(0, 0, 0, 0.3), 
-                0 0 20px rgba(241, 196, 15, 0.8); 
+                3px 3px 0 #000, 
+                6px 6px 0 rgba(0, 0, 0, 0.3), 
+                0 0 25px rgba(241, 196, 15, 0.9); 
+            text-transform: uppercase; 
         }
         
-        /* --- NOM DU CRÉATEUR (BLANC, GRAS, STYLÉ) --- */
+        /* --- NOM DU CRÉATEUR (PETIT TAILLE, POLICE FINE) --- */
         #creator-name {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.5rem; 
-            font-weight: 900; 
-            color: var(--creator-color); 
-            letter-spacing: 5px; 
+            font-size: 0.9rem; /* PETIT TAILLE */
+            font-weight: 400; /* POLICE FINE */
+            color: #d1d5db; 
+            letter-spacing: 1px; 
             margin-top: 10px;
             display: block;
-            text-transform: uppercase;
-            /* Effet 3D/Glow */
-            text-shadow: 
-                1px 1px 3px rgba(0, 0, 0, 0.7), 
-                0 0 15px rgba(100, 150, 255, 0.7); 
+            font-style: italic; /* EN ITALIQUE */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
         }
         
         @keyframes pulse-flash { 
@@ -172,12 +168,11 @@
             max-width: 90%; width: 400px; font-size: 1rem;
         }
         .modal-content input {
-            /* CORRECTION: Police Noire pour la lisibilité */
-            color: #111; 
+            color: #111; /* Police Noire pour la lisibilité */
             width: 100%;
             padding: 10px;
             margin: 15px 0;
-            background: var(--text-color); /* Fond de la boîte de saisie en blanc/gris clair */
+            background: var(--text-color); 
             border: 2px solid var(--accent-color);
             text-align: center;
             border-radius: 5px;
@@ -216,6 +211,16 @@
         #message {
             font-size: 1.1em; color: #bdc3c7; width: 100%;
         }
+        /* Media Query pour les petits écrans afin de garder le titre lisible */
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 3rem;
+            }
+            #logo-flash {
+                width: 40px;
+                height: 40px;
+            }
+        }
 
     </style>
 </head>
@@ -225,13 +230,14 @@
         
         <div id="header-area">
             <div id="title-wrapper">
-                <!-- LOGO ÉCLAIR SVG -->
+                
                 <svg id="logo-flash" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M11 15.69v5.82c0 .81.99 1.13 1.55.56l5.7-5.7c.3-.3.45-.66.45-1.01V7.91c0-.81-.99-1.13-1.55-.56l-5.7 5.7c-.3.3-.45.66-.45 1.01v1.54zM7 2.5a.5.5 0 00-.5.5v12.62c0 .82.99 1.13 1.55.56l5.7-5.7c.3-.3.45-.66.45-1.01V5.01c0-.81-.99-1.13-1.55-.56l-5.7 5.7c-.3.3-.45.66-.45 1.01V3a.5.5 0 00-.5-.5z"/>
                 </svg>
                 <h1>LE SPECTRE ÉCLAIR</h1>
             </div>
-            <span id="creator-name">DRAMANE MILLOGO</span>
+            
+            <span id="creator-name">Créé par Dramane MILLOGO</span>
         </div>
         
         <div id="top-controls-panel">
@@ -259,7 +265,7 @@
         <button id="startButton">CLIQUEZ POUR DÉMARRER</button>
     </div>
 
-    <!-- MODALE POUR LA SAISIE DU NOM (CACHÉE PAR DÉFAUT) -->
+    
     <div id="nameModal" class="modal-overlay">
         <div class="modal-content">
             <p class="text-lg font-bold mb-4" style="color: var(--accent-color);">👑 NOUVEAU RECORD PERSONNEL ! 🎖️</p>
