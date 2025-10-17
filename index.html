@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Le Spectre Éclair - Créateur Dramane MILLOGO</title>
     
-    <!-- PWA: Rendre l'application installable -->
+    <!-- PWA: Rendre l'application installable (manifest et icônes restent des placeholders) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e2f3c">
-    
-    <!-- PWA: Icône par défaut (Vous devez créer icon-192.png) -->
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 
@@ -264,7 +262,9 @@
                 <button class="speed-button" onclick="increaseSpeed()">Rapide (+)</button>
             </div>
             
-            <div id="highScore" class="info-panel"></div>
+            <div id="highScore" class="info-panel">
+                <span style="color:#bdc3c7;">Chargement du Record...</span>
+            </div>
         </div>
 
         <div id="play-area">
@@ -277,14 +277,32 @@
     
     <div id="nameModal" class="modal-overlay">
         <div class="modal-content">
-            <p class="text-lg font-bold mb-4" style="color: var(--accent-color);">👑 NOUVEAU RECORD PERSONNEL ! 🎖️</p>
+            <p class="text-lg font-bold mb-4" style="color: var(--accent-color);">👑 NOUVEAU RECORD PERSONNEL GLOBAL ! 🎖️</p>
             <p>Félicitations, Expert ! Entrez votre nom pour enregistrer votre performance :</p>
             <input type="text" id="playerNameInput" maxlength="15" placeholder="Votre nom (Max 15 caractères)" />
             <button id="submitNameButton" class="speed-button" onclick="saveNewHighScore()">VALIDER</button>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // --- FIREBASE IMPORTS ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+
+        // === FIREBASE INITIALIZATION & GLOBALS ===
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db;
+        let auth;
+
+        // Path du document Firestore pour le record public (partagé par tous)
+        const HIGH_SCORE_DOC_PATH = `/artifacts/${appId}/public/data/high_scores/lightning_spectre_record`;
+
         // === ÉLÉMENTS DU DOM ===
         const body = document.body;
         const playArea = document.getElementById('play-area');
@@ -311,8 +329,66 @@
         let gameSpeed = INITIAL_SPEED;
         let startTime; 
 
-        // Meilleur score stocké sous forme d'objet JSON
-        let high_score_data = JSON.parse(localStorage.getItem('equilibreExpertHighScoreData')) || { score: 0, name: 'Anonyme' };
+        // Remplacé par une variable d'état réactive gérée par Firestore
+        let high_score_data = { score: 0, name: 'Anonyme' };
+
+
+        /**
+         * Initialise Firebase et authentifie l'utilisateur.
+         */
+        async function initFirebaseAndAuth() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing. High score will not be saved or shared.");
+                return;
+            }
+            try {
+                // setLogLevel('Debug'); // Afficher les logs Firebase pour le débogage
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authentification
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                setupHighScoreListener();
+
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+            }
+        }
+        
+        /**
+         * Met en place l'écouteur en temps réel sur le record global.
+         */
+        function setupHighScoreListener() {
+            if (!db) return;
+            
+            const docRef = doc(db, HIGH_SCORE_DOC_PATH);
+
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    // Si un record existe, mettez à jour l'état local du record global
+                    high_score_data = docSnap.data();
+                    // Assurez-vous que le score est un nombre
+                    high_score_data.score = parseInt(high_score_data.score, 10) || 0;
+                    high_score_data.name = high_score_data.name || 'Anonyme';
+                } else {
+                    // Document n'existe pas, initialisez-le localement
+                    high_score_data = { score: 0, name: 'Anonyme' };
+                }
+                updateHighScoreDisplay();
+            }, (error) => {
+                console.error("Erreur lors de l'écoute du record Firestore:", error);
+                // Utilise le record local par défaut en cas d'erreur de connexion
+                high_score_data = { score: 0, name: 'Anonyme (Erreur DB)' };
+                updateHighScoreDisplay();
+            });
+        }
+
 
         // --- Fonctions Utilitaires ---
 
@@ -320,10 +396,13 @@
             return arr[Math.floor(Math.random() * arr.length)];
         }
         
+        /**
+         * Met à jour l'affichage du record global (synchronisé par Firestore).
+         */
         function updateHighScoreDisplay() {
             const { score: bestScore, name: bestName } = high_score_data;
             const badge = '<span class="badge" title="Expert de l\'Équilibre">🎖️</span>';
-            const crown = '<span class="badge" title="Détenteur du Record">👑</span>';
+            const crown = '<span class="badge" title="Détenteur du Record Global">👑</span>';
             
             highScoreDisplay.innerHTML = `${crown} ${bestName} <br>Score: ${bestScore} ${badge}`;
         }
@@ -428,13 +507,15 @@
                 body.style.backgroundColor = '#c0392b'; 
                 setTimeout(() => { 
                     if(lives > 0) {
-                         const currentBlocks = playArea.querySelectorAll('.color-block');
-                         if (currentBlocks.length > 0) {
+                        // Tente de rétablir la couleur de fond correcte (celle de la majorité des blocs)
+                        const currentBlocks = playArea.querySelectorAll('.color-block');
+                        if (currentBlocks.length > 0) {
+                            // Le bloc non-cible a la couleur de fond
                             const bgColor = currentBlocks[0].dataset.isTarget === 'false' ? currentBlocks[0].style.backgroundColor : getRandomElement(COLORS);
                             body.style.backgroundColor = bgColor;
-                         } else {
+                        } else {
                             body.style.backgroundColor = getRandomElement(COLORS);
-                         }
+                        }
                     }
                 }, 200);
 
@@ -472,7 +553,7 @@
         function gameOver() {
             if (gameInterval) clearInterval(gameInterval);
             
-            // --- CONTRÔLE DE LA MODALE : Affichage UNIQUEMENT si le record est battu ---
+            // --- CONTRÔLE DE LA MODALE : Affichage UNIQUEMENT si le record GLOBAL est battu ---
             if (score > high_score_data.score) {
                 // Affiche la modale et met le focus sur le champ de nom
                 nameModal.style.display = 'flex'; 
@@ -480,7 +561,7 @@
                 playerNameInput.focus();
             } else {
                 // Affiche simplement le message de fin de partie
-                displayGameOverMessage(`PARTIE TERMINÉE ! Score final: ${score}<br>Meilleur score: ${high_score_data.score}`);
+                displayGameOverMessage(`PARTIE TERMINÉE ! Score final: ${score}<br>Record global: ${high_score_data.score}`);
             }
 
             startButton.textContent = "REJOUER";
@@ -498,9 +579,9 @@
         }
 
         /**
-         * Gère la sauvegarde du nouveau record personnel avec le nom.
+         * Gère la sauvegarde du nouveau record personnel avec le nom vers Firestore.
          */
-        function saveNewHighScore() {
+        async function saveNewHighScore() {
             let playerName = playerNameInput.value.trim();
             if (playerName.length === 0) {
                 playerName = 'Expert Inconnu';
@@ -509,24 +590,41 @@
                 playerName = playerName.substring(0, 15);
             }
 
-            high_score_data = {
+            const newHighScoreData = {
                 score: score,
-                name: playerName
+                name: playerName,
+                timestamp: Date.now() // Ajout d'un horodatage
             };
             
-            localStorage.setItem('equilibreExpertHighScoreData', JSON.stringify(high_score_data));
-            
-            nameModal.style.display = 'none';
-            
-            updateHighScoreDisplay();
-            displayGameOverMessage(`NOUVEAU RECORD !<br>Félicitations, <span style="color:var(--accent-color)">${playerName}</span> ! Vous êtes l'Équilibriste Expert !`);
+            // Étape 1: Mettre à jour Firestore
+            if (db) {
+                const docRef = doc(db, HIGH_SCORE_DOC_PATH);
+                try {
+                    // Utiliser setDoc pour remplacer l'ancien record
+                    await setDoc(docRef, newHighScoreData);
+                    console.log("Nouveau record enregistré sur Firestore !");
+
+                    // Étape 2: Mise à jour visuelle et masquage de la modale
+                    nameModal.style.display = 'none';
+                    // Le listener onSnapshot mettra à jour high_score_data et l'affichage (updateHighScoreDisplay)
+                    
+                    displayGameOverMessage(`NOUVEAU RECORD GLOBAL !<br>Félicitations, <span style="color:var(--accent-color)">${playerName}</span> ! Vous êtes l'Équilibriste Expert !`);
+
+                } catch (e) {
+                    console.error("Erreur lors de l'écriture du document Firestore: ", e);
+                    // En cas d'échec de la base de données, affichez le message sans enregistrer.
+                    nameModal.style.display = 'none';
+                    displayGameOverMessage(`Record non enregistré (Erreur de connexion). Score: ${score}`);
+                }
+            } else {
+                // Pas de DB, juste fermer la modale
+                nameModal.style.display = 'none';
+                displayGameOverMessage(`Record non enregistré (DB non connectée). Score: ${score}`);
+            }
         }
         
-        // --- Initialisation et PWA ---
+        // --- PWA ---
         
-        /**
-         * Enregistre le Service Worker pour le mode hors-ligne.
-         */
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
@@ -536,6 +634,7 @@
                             console.log('Service Worker enregistré avec succès:', registration.scope);
                         })
                         .catch(error => {
+                            // C'est normal si sw.js n'existe pas dans cet environnement
                             console.log('Échec de l\'enregistrement du Service Worker (fichier sw.js manquant ou erreur):', error);
                         });
                 });
@@ -543,7 +642,7 @@
         }
 
         window.onload = function() {
-            updateHighScoreDisplay();
+            initFirebaseAndAuth(); // Initialisation Firebase et écouteur de record
             updateGameInterval();
             registerServiceWorker(); 
         };
